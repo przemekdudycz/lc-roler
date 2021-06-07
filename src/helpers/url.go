@@ -3,7 +3,7 @@ package helpers
 import "strings"
 
 var (
-	integrationUrl = "http://2e033de752e7.ngrok.io/install"
+	integrationUrl = "https://be74ce1adba2.ngrok.io/install"
 	// External URLs
 	authBaseUrl      = "https://accounts.labs.livechat.com"
 	authApiVersion   = "v2"
