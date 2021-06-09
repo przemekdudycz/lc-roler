@@ -8,4 +8,5 @@ import (
 
 func SetApiRoutes(router *mux.Router) {
 	router.HandleFunc("/install", handlers.HandleInstall)
+	router.HandleFunc("/newchat", handlers.HandleNewChat)
 }

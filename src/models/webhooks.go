@@ -20,8 +20,8 @@ type WebhookResponse struct {
 }
 
 func GetWebhooksList(clientId string) []WebhookResponse {
-	getWebhooksListUrl := helpers.WebhooksListUrl()
 	httpClient := GetAuthenticatedHttpClient()
+	getWebhooksListUrl := helpers.WebhooksListUrl()
 
 	reqBodyValues := map[string]interface{}{
 		"owner_client_id": clientId,
@@ -30,7 +30,7 @@ func GetWebhooksList(clientId string) []WebhookResponse {
 	req, _ := http.NewRequest("POST", getWebhooksListUrl, bytes.NewReader(reqBody))
 	req.Header.Add("Content-Type", "application/json")
 
-	res, err := httpClient.PerformRequest(req)
+	res, err := httpClient.PerformRequest(req, "agentAuth")
 
 	if err != nil {
 		fmt.Printf("There was an error: %v", err.Error())
@@ -57,6 +57,52 @@ func IsWebhookWithActionInSlice(webhooks []WebhookResponse, webhookAction string
 	return false
 }
 
-// func RegisterWebhook(){}
+func RegisterWebhook(clientId string, webhookAction string, destinationWebhookUrl string) string {
+	httpClient := GetAuthenticatedHttpClient()
+	registerWebhookUrl := helpers.RegisterWebhookUrl()
 
-// func EnableWebhook(){}
+	reqBodyValues := map[string]interface{}{
+		"url":             destinationWebhookUrl,
+		"description":     "New chat lc-roler webhook",
+		"action":          webhookAction,
+		"secret_key":      "verysecretkey",
+		"owner_client_id": clientId,
+		"type":            "license",
+	}
+	reqBody, _ := json.Marshal(reqBodyValues)
+	req, _ := http.NewRequest("POST", registerWebhookUrl, bytes.NewReader(reqBody))
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := httpClient.PerformRequest(req, "agentAuth")
+
+	if err != nil {
+		fmt.Printf("There was an error: %v", err.Error())
+	}
+
+	defer res.Body.Close()
+	raw, _ := ioutil.ReadAll(res.Body)
+	return string(raw)
+}
+
+func EnableWebhooks() {
+	httpClient := GetAuthenticatedHttpClient()
+	enableWebhookUrl := helpers.EnableWebhookUrl()
+
+	reqBody, _ := json.Marshal(map[string]interface{}{})
+
+	req, _ := http.NewRequest("POST", enableWebhookUrl, bytes.NewReader(reqBody))
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := httpClient.PerformRequest(req, "agentAuth")
+	fmt.Printf("After enabling: %v", res.StatusCode)
+
+	if err != nil {
+		fmt.Printf("There was an error: %v", err.Error())
+	}
+
+	if res.StatusCode != 200 {
+		fmt.Printf("Invalid response: %v", res.StatusCode)
+	}
+
+	defer res.Body.Close()
+}

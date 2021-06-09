@@ -11,10 +11,14 @@ import (
 	"livechat.com/lc-roler/helpers"
 )
 
+type AuthData struct {
+	AccessToken  *string
+	RefreshToken *string
+}
+
 type AuthenticatedHttpClient struct {
-	httpClient   *http.Client
-	accessToken  *string
-	refreshToken *string
+	httpClient *http.Client
+	authData   map[string]AuthData
 }
 
 var (
@@ -33,27 +37,24 @@ func GetAuthenticatedHttpClient() *AuthenticatedHttpClient {
 
 	authenticatedClient = &AuthenticatedHttpClient{
 		httpClient: httpClient,
+		authData:   make(map[string]AuthData),
 	}
 	return authenticatedClient
 }
 
-func (ac *AuthenticatedHttpClient) Init(code string, clientId string, clientSecret string) {
-	accessToken, refreshToken := getAuthTokens(code, clientId, clientSecret)
-	fmt.Printf("AccessToken: %v \n", accessToken)
-	fmt.Printf("RefreshToken: %v \n", refreshToken)
-	ac.accessToken = &accessToken
-	ac.refreshToken = &refreshToken
+func (ac *AuthenticatedHttpClient) AddAuthData(authData *AuthData, authSource string) {
+	ac.authData[authSource] = *authData
 }
 
-func (ac *AuthenticatedHttpClient) PerformRequest(r *http.Request) (*http.Response, error) {
-	if ac.accessToken == nil {
+func (ac *AuthenticatedHttpClient) PerformRequest(r *http.Request, accessSource string) (*http.Response, error) {
+	if ac.authData[accessSource].AccessToken == nil {
 		return nil, fmt.Errorf("you need to authenticate the application")
 	}
-	r.Header.Add("Authorization", fmt.Sprintf("Bearer %v", *ac.accessToken))
+	r.Header.Add("Authorization", fmt.Sprintf("Bearer %v", *ac.authData[accessSource].AccessToken))
 	return ac.httpClient.Do(r)
 }
 
-func getAuthTokens(code string, clientId string, clientSecret string) (string, string) {
+func GetAuthTokens(code string, clientId string, clientSecret string) (string, string) {
 	reqBodyValues := map[string]string{
 		"grant_type":    "authorization_code",
 		"code":          code,
@@ -79,4 +80,37 @@ func getAuthTokens(code string, clientId string, clientSecret string) (string, s
 	}
 
 	return authResponseObject.AccessToken, authResponseObject.RefreshToken
+}
+
+func GetCustomerAccessTokens(clientId string) string {
+	httpClient := GetAuthenticatedHttpClient()
+	customerAccessTokenUrl := helpers.CustomerAccessTokenUrl()
+	integrationUrl := helpers.IntegrationUrl()
+
+	reqBodyValues := map[string]string{
+		"client_id":     clientId,
+		"response_type": "token",
+		"redirect_uri":  integrationUrl,
+	}
+	reqBody, _ := json.Marshal(reqBodyValues)
+
+	req, _ := http.NewRequest("POST", customerAccessTokenUrl, bytes.NewReader(reqBody))
+	req.Header.Add("Content-Type", "application/json")
+
+	res, _ := httpClient.PerformRequest(req, "agentAuth")
+
+	defer res.Body.Close()
+
+	bodyBytes, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Printf("Response body: %v", string(bodyBytes))
+	authResponseObject := struct {
+		AccessToken string `json:"access_token"`
+	}{}
+
+	err := json.Unmarshal(bodyBytes, &authResponseObject)
+	if err != nil {
+		panic(err)
+	}
+	return authResponseObject.AccessToken
 }

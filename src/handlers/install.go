@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"livechat.com/lc-roler/config"
+	"livechat.com/lc-roler/helpers"
 	"livechat.com/lc-roler/models"
 )
 
@@ -15,16 +16,26 @@ func HandleInstall(w http.ResponseWriter, r *http.Request) {
 	code := queryParams["code"]
 
 	authenticatedHttpClient := models.GetAuthenticatedHttpClient()
-	authenticatedHttpClient.Init(strings.Join(code, ""), authConfiguration.ClientId, authConfiguration.ClientSecret)
+	accessToken, refreshToken := models.GetAuthTokens(strings.Join(code, ""), authConfiguration.ClientId, authConfiguration.ClientSecret)
+	fmt.Printf("AccessToken: %v \n", accessToken)
+	fmt.Printf("RefreshToken: %v \n", refreshToken)
+	authenticatedHttpClient.AddAuthData(&models.AuthData{AccessToken: &accessToken, RefreshToken: &refreshToken}, "agentAuth")
+
+	customerAccessToken := models.GetCustomerAccessTokens(authConfiguration.ClientId)
+	fmt.Printf("Customer access token: %v \n", customerAccessToken)
+	authenticatedHttpClient.AddAuthData(&models.AuthData{AccessToken: &customerAccessToken}, "customerAuth")
 
 	existingWebhooks := models.GetWebhooksList(authConfiguration.ClientId)
 	fmt.Printf("Existing webhooks: %v", existingWebhooks)
 
-	// isNewChatWebhookExists := models.IsWebhookWithActionInSlice(existingWebhooks, "incoming_chat")
-	// if !isNewChatWebhookExists {
-	// 	// registerWebhook()
-	// 	// enableWebhook()
-	// }
+	newChatWebhookAction := "incoming_chat"
+	destinationNewChatWebhookUrl := helpers.DestinationNewChatWebhookUrl()
+	isNewChatWebhookExists := models.IsWebhookWithActionInSlice(existingWebhooks, newChatWebhookAction)
+	if !isNewChatWebhookExists {
+		webhookId := models.RegisterWebhook(authConfiguration.ClientId, newChatWebhookAction, destinationNewChatWebhookUrl)
+		fmt.Printf("WebhookId: %v \n", webhookId)
+		models.EnableWebhooks()
+	}
 
 	fmt.Fprintln(w, "Installation completed")
 }

@@ -1,22 +1,31 @@
 package helpers
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 var (
-	integrationUrl = "https://be74ce1adba2.ngrok.io/install"
+	baseAppUrl = "http://07761b52172b.ngrok.io"
 	// External URLs
-	authBaseUrl      = "https://accounts.labs.livechat.com"
-	authApiVersion   = "v2"
-	configBaseUrl    = "https://api.labs.livechatinc.com"
-	configApiVersion = "v3.3"
+	authBaseUrl        = "https://accounts.labs.livechat.com"
+	authApiVersion     = "v2"
+	configBaseUrl      = "https://api.labs.livechatinc.com"
+	configApiVersion   = "v3.3"
+	customerApiBaseUrl = "https://api.labs.livechatinc.com"
+	customerApiVersion = "v3.3"
 )
 
 func IntegrationUrl() string {
-	return integrationUrl
+	return strings.Join([]string{baseAppUrl, "install"}, "/")
 }
 
 func AccessTokenUrl() string {
 	return strings.Join([]string{authBaseUrl, authApiVersion, "token"}, "/")
+}
+
+func CustomerAccessTokenUrl() string {
+	return strings.Join([]string{authBaseUrl, "customer"}, "/")
 }
 
 func WebhooksListUrl() string {
@@ -29,4 +38,13 @@ func RegisterWebhookUrl() string {
 
 func EnableWebhookUrl() string {
 	return strings.Join([]string{configBaseUrl, configApiVersion, "configuration", "action", "enable_license_webhooks"}, "/")
+}
+
+func DestinationNewChatWebhookUrl() string {
+	return strings.Join([]string{baseAppUrl, "newchat"}, "/")
+}
+
+func GetSendEventUrl(licenseId string) string {
+	url := strings.Join([]string{customerApiBaseUrl, customerApiVersion, "agent", "action", "send_event"}, "/")
+	return fmt.Sprintf("%v?license_id=%v", url, licenseId)
 }
