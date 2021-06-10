@@ -11,32 +11,11 @@ import (
 	"livechat.com/lc-roler/helpers"
 )
 
-func SendMessageToCustomer(chatId string) string {
+func SendMessageToCustomer(reqBodyValues map[string]interface{}) string {
 	httpClient := GetAuthenticatedHttpClient()
 	config := config.GetAuthConfiguration()
 	sendEventUrl := helpers.GetSendEventUrl(config.LicenseId)
 
-	reqBodyValues := map[string]interface{}{
-		"chat_id": chatId,
-		"event": map[string]interface{}{
-			"type":        "rich_message",
-			"template_id": "quick_replies",
-			"elements": []map[string]interface{}{
-				{
-					"title": "What do you want from lc-roler?",
-					"buttons": []map[string]interface{}{
-						{
-							"type":        "message",
-							"text":        "GetAgentsList",
-							"postback_id": "send_message",
-							"value":       "agentsList",
-							"user_ids":    []interface{}{},
-						},
-					},
-				},
-			},
-		},
-	}
 	reqBody, _ := json.Marshal(reqBodyValues)
 	req, _ := http.NewRequest("POST", sendEventUrl, bytes.NewReader(reqBody))
 

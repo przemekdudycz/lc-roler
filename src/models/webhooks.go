@@ -19,6 +19,20 @@ type WebhookResponse struct {
 	Type          string `json:"type"`
 }
 
+type WebhookFilter struct {
+	AuthorType string `json:"author_type"`
+}
+
+type WebhookRequestBody struct {
+	Url           string        `json:"url"`
+	Description   string        `json:"description"`
+	Action        string        `json:"action"`
+	SecretKey     string        `json:"secret_key"`
+	OwnerClientId string        `json:"owner_client_id"`
+	Type          string        `json:"type"`
+	Filters       WebhookFilter `json:"filters"`
+}
+
 func GetWebhooksList(clientId string) []WebhookResponse {
 	httpClient := GetAuthenticatedHttpClient()
 	getWebhooksListUrl := helpers.WebhooksListUrl()
@@ -57,19 +71,10 @@ func IsWebhookWithActionInSlice(webhooks []WebhookResponse, webhookAction string
 	return false
 }
 
-func RegisterWebhook(clientId string, webhookAction string, destinationWebhookUrl string) string {
+func RegisterWebhook(webhookData WebhookRequestBody) string {
 	httpClient := GetAuthenticatedHttpClient()
 	registerWebhookUrl := helpers.RegisterWebhookUrl()
-
-	reqBodyValues := map[string]interface{}{
-		"url":             destinationWebhookUrl,
-		"description":     "New chat lc-roler webhook",
-		"action":          webhookAction,
-		"secret_key":      "verysecretkey",
-		"owner_client_id": clientId,
-		"type":            "license",
-	}
-	reqBody, _ := json.Marshal(reqBodyValues)
+	reqBody, _ := json.Marshal(webhookData)
 	req, _ := http.NewRequest("POST", registerWebhookUrl, bytes.NewReader(reqBody))
 	req.Header.Add("Content-Type", "application/json")
 

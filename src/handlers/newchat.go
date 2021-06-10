@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"livechat.com/lc-roler/helpers"
 	"livechat.com/lc-roler/models"
 )
 
@@ -22,7 +23,7 @@ type NewChatWebhookRequest struct {
 }
 
 func HandleNewChat(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("New chat handler")
+	fmt.Printf("New chat handler \n")
 	body, _ := ioutil.ReadAll(r.Body)
 	jsonBody := NewChatWebhookRequest{}
 	if err := json.Unmarshal(body, &jsonBody); err != nil {
@@ -32,6 +33,7 @@ func HandleNewChat(w http.ResponseWriter, r *http.Request) {
 	chatId := jsonBody.Payload.Chat.Id
 	fmt.Printf("ChatId: %v \n", chatId)
 
-	eventId := models.SendMessageToCustomer(chatId)
+	messageBody := helpers.WelcomeMessage(chatId)
+	eventId := models.SendMessageToCustomer(messageBody)
 	fmt.Printf("EventId: %v \n", eventId)
 }

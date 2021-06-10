@@ -9,4 +9,6 @@ import (
 func SetApiRoutes(router *mux.Router) {
 	router.HandleFunc("/install", handlers.HandleInstall)
 	router.HandleFunc("/newchat", handlers.HandleNewChat)
+	router.HandleFunc("/rmpostback", handlers.HandleRMPostback)
+	router.HandleFunc("/newevent", handlers.HandleEvent)
 }

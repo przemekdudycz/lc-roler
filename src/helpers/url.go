@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	baseAppUrl = "http://07761b52172b.ngrok.io"
+	baseAppUrl = "http://57060598b608.ngrok.io"
 	// External URLs
 	authBaseUrl        = "https://accounts.labs.livechat.com"
 	authApiVersion     = "v2"
@@ -44,7 +44,19 @@ func DestinationNewChatWebhookUrl() string {
 	return strings.Join([]string{baseAppUrl, "newchat"}, "/")
 }
 
+func DestinationRMPostbackWebhookUrl() string {
+	return strings.Join([]string{baseAppUrl, "rmpostback"}, "/")
+}
+
+func DestinationEventWebhookUrl() string {
+	return strings.Join([]string{baseAppUrl, "newevent"}, "/")
+}
+
 func GetSendEventUrl(licenseId string) string {
 	url := strings.Join([]string{customerApiBaseUrl, customerApiVersion, "agent", "action", "send_event"}, "/")
 	return fmt.Sprintf("%v?license_id=%v", url, licenseId)
+}
+
+func GetAgentsListUrl() string {
+	return strings.Join([]string{configBaseUrl, configApiVersion, "action", "list_agents"}, "/")
 }
