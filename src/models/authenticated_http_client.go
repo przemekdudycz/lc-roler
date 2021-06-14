@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"livechat.com/lc-roler/helpers"
+	"livechat.com/lc-roler/config"
 )
 
 type AuthData struct {
@@ -60,11 +60,11 @@ func GetAuthTokens(code string, clientId string, clientSecret string) (string, s
 		"code":          code,
 		"client_id":     clientId,
 		"client_secret": clientSecret,
-		"redirect_uri":  helpers.IntegrationUrl(),
+		"redirect_uri":  config.IntegrationUrl(),
 	}
 	jsonReqBody, _ := json.Marshal(reqBodyValues)
 
-	authResponse, _ := http.Post(helpers.AccessTokenUrl(), "application/json", bytes.NewBuffer(jsonReqBody))
+	authResponse, _ := http.Post(config.AccessTokenUrl(), "application/json", bytes.NewBuffer(jsonReqBody))
 	defer authResponse.Body.Close()
 
 	bodyBytes, _ := ioutil.ReadAll(authResponse.Body)
@@ -84,8 +84,8 @@ func GetAuthTokens(code string, clientId string, clientSecret string) (string, s
 
 func GetCustomerAccessTokens(clientId string) string {
 	httpClient := GetAuthenticatedHttpClient()
-	customerAccessTokenUrl := helpers.CustomerAccessTokenUrl()
-	integrationUrl := helpers.IntegrationUrl()
+	customerAccessTokenUrl := config.CustomerAccessTokenUrl()
+	integrationUrl := config.IntegrationUrl()
 
 	reqBodyValues := map[string]string{
 		"client_id":     clientId,

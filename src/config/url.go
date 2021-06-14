@@ -1,4 +1,4 @@
-package helpers
+package config
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	baseAppUrl = "http://57060598b608.ngrok.io"
+	baseAppUrl = "http://2e883e0f1d0e.ngrok.io"
 	// External URLs
 	authBaseUrl        = "https://accounts.labs.livechat.com"
 	authApiVersion     = "v2"
@@ -58,5 +58,5 @@ func GetSendEventUrl(licenseId string) string {
 }
 
 func GetAgentsListUrl() string {
-	return strings.Join([]string{configBaseUrl, configApiVersion, "action", "list_agents"}, "/")
+	return strings.Join([]string{configBaseUrl, configApiVersion, "configuration", "action", "list_agents"}, "/")
 }

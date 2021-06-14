@@ -8,13 +8,23 @@ import (
 	"net/http"
 
 	"livechat.com/lc-roler/config"
-	"livechat.com/lc-roler/helpers"
 )
 
-func SendMessageToCustomer(reqBodyValues map[string]interface{}) string {
+type ChatEvent struct {
+	Type       string                   `json:"type"`
+	TemplateId string                   `json:"template_id"`
+	Elements   []map[string]interface{} `json:"elements"`
+}
+
+type ChatMessage struct {
+	ChatId string    `json:"chat_id"`
+	Event  ChatEvent `json:"event"`
+}
+
+func SendMessageToCustomer(reqBodyValues ChatMessage) string {
 	httpClient := GetAuthenticatedHttpClient()
-	config := config.GetAuthConfiguration()
-	sendEventUrl := helpers.GetSendEventUrl(config.LicenseId)
+	authConfig := config.GetAuthConfiguration()
+	sendEventUrl := config.GetSendEventUrl(authConfig.LicenseId)
 
 	reqBody, _ := json.Marshal(reqBodyValues)
 	req, _ := http.NewRequest("POST", sendEventUrl, bytes.NewReader(reqBody))

@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"livechat.com/lc-roler/helpers"
+	"livechat.com/lc-roler/config"
 )
 
 type WebhookResponse struct {
@@ -35,7 +35,7 @@ type WebhookRequestBody struct {
 
 func GetWebhooksList(clientId string) []WebhookResponse {
 	httpClient := GetAuthenticatedHttpClient()
-	getWebhooksListUrl := helpers.WebhooksListUrl()
+	getWebhooksListUrl := config.WebhooksListUrl()
 
 	reqBodyValues := map[string]interface{}{
 		"owner_client_id": clientId,
@@ -73,7 +73,7 @@ func IsWebhookWithActionInSlice(webhooks []WebhookResponse, webhookAction string
 
 func RegisterWebhook(webhookData WebhookRequestBody) string {
 	httpClient := GetAuthenticatedHttpClient()
-	registerWebhookUrl := helpers.RegisterWebhookUrl()
+	registerWebhookUrl := config.RegisterWebhookUrl()
 	reqBody, _ := json.Marshal(webhookData)
 	req, _ := http.NewRequest("POST", registerWebhookUrl, bytes.NewReader(reqBody))
 	req.Header.Add("Content-Type", "application/json")
@@ -91,7 +91,7 @@ func RegisterWebhook(webhookData WebhookRequestBody) string {
 
 func EnableWebhooks() {
 	httpClient := GetAuthenticatedHttpClient()
-	enableWebhookUrl := helpers.EnableWebhookUrl()
+	enableWebhookUrl := config.EnableWebhookUrl()
 
 	reqBody, _ := json.Marshal(map[string]interface{}{})
 

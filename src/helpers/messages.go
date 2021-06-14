@@ -1,12 +1,18 @@
 package helpers
 
-func WelcomeMessage(chatId string) map[string]interface{} {
-	return map[string]interface{}{
-		"chat_id": chatId,
-		"event": map[string]interface{}{
-			"type":        "rich_message",
-			"template_id": "quick_replies",
-			"elements": []map[string]interface{}{
+import (
+	"fmt"
+
+	"livechat.com/lc-roler/models"
+)
+
+func WelcomeMessage(chatId string) models.ChatMessage {
+	return models.ChatMessage{
+		ChatId: chatId,
+		Event: models.ChatEvent{
+			Type:       "rich_message",
+			TemplateId: "quick_replies",
+			Elements: []map[string]interface{}{
 				{
 					"title": "What do you want from lc-roler?",
 					"buttons": []map[string]interface{}{
@@ -29,4 +35,23 @@ func WelcomeMessage(chatId string) map[string]interface{} {
 			},
 		},
 	}
+}
+
+func AgentsListMessage(chatId string, agentsList []models.Agent) models.ChatMessage {
+	message := models.ChatMessage{
+		ChatId: chatId,
+		Event: models.ChatEvent{
+			Type:       "rich_message",
+			TemplateId: "cards",
+			Elements:   []map[string]interface{}{},
+		},
+	}
+
+	for _, agent := range agentsList {
+		message.Event.Elements = append(message.Event.Elements, map[string]interface{}{
+			"title":    fmt.Sprintf("Name: %v", agent.Name),
+			"subtitle": fmt.Sprintf("Email: %v \n Role: %v", agent.Id, agent.Role),
+		})
+	}
+	return message
 }

@@ -44,11 +44,15 @@ func HandleEvent(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Event body: %v", string(body))
 
 	if jsonBody.Payload.Event.Postback.Value == helpers.GetAgentsList {
-		handleGetAgentsList()
+		handleGetAgentsList(jsonBody.Payload.ChatId)
 	}
 }
 
-func handleGetAgentsList() {
+func handleGetAgentsList(chatId string) {
 	agentsList := models.GetAgentsList()
+	agentListMessage := helpers.AgentsListMessage(chatId, agentsList)
 	fmt.Printf("AgentRole: %v", agentsList[0].Role)
+
+	models.SendMessageToCustomer(agentListMessage)
+	fmt.Printf("Message sended!")
 }

@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"livechat.com/lc-roler/helpers"
+	"livechat.com/lc-roler/config"
 )
 
 type Agent struct {
@@ -18,7 +18,7 @@ type Agent struct {
 
 func GetAgentsList() []Agent {
 	httpClient := GetAuthenticatedHttpClient()
-	getAgentsListUrl := helpers.GetAgentsListUrl()
+	getAgentsListUrl := config.GetAgentsListUrl()
 
 	reqBody, _ := json.Marshal(map[string]interface{}{})
 

@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"livechat.com/lc-roler/config"
-	"livechat.com/lc-roler/helpers"
 	"livechat.com/lc-roler/models"
 )
 
@@ -32,9 +31,9 @@ func HandleInstall(w http.ResponseWriter, r *http.Request) {
 	rmPostbackWebhookAction := "incoming_rich_message_postback"
 	eventWebhookAction := "incoming_event"
 
-	destinationNewChatWebhookUrl := helpers.DestinationNewChatWebhookUrl()
-	destinationRMPostbackWebhookUrl := helpers.DestinationRMPostbackWebhookUrl()
-	destintionEventWebhookUrl := helpers.DestinationEventWebhookUrl()
+	destinationNewChatWebhookUrl := config.DestinationNewChatWebhookUrl()
+	destinationRMPostbackWebhookUrl := config.DestinationRMPostbackWebhookUrl()
+	destintionEventWebhookUrl := config.DestinationEventWebhookUrl()
 
 	isNewChatWebhookExists := models.IsWebhookWithActionInSlice(existingWebhooks, newChatWebhookAction)
 	isRMPostbackWebhookExists := models.IsWebhookWithActionInSlice(existingWebhooks, rmPostbackWebhookAction)
