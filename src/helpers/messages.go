@@ -18,16 +18,16 @@ func WelcomeMessage(chatId string) models.ChatMessage {
 					"buttons": []map[string]interface{}{
 						{
 							"type":        "message",
-							"text":        GetAgentsList,
+							"text":        "Agent List",
 							"postback_id": "send_message",
 							"value":       GetAgentsList,
 							"user_ids":    []interface{}{},
 						},
 						{
 							"type":        "message",
-							"text":        GetRolesList,
+							"text":        "Nothing",
 							"postback_id": "send_message",
-							"value":       GetRolesList,
+							"value":       "Nothing",
 							"user_ids":    []interface{}{},
 						},
 					},
@@ -51,6 +51,29 @@ func AgentsListMessage(chatId string, agentsList []models.Agent) models.ChatMess
 		message.Event.Elements = append(message.Event.Elements, map[string]interface{}{
 			"title":    fmt.Sprintf("Name: %v", agent.Name),
 			"subtitle": fmt.Sprintf("Email: %v \n Role: %v", agent.Id, agent.Role),
+			"buttons": []map[string]interface{}{
+				{
+					"type":        "message",
+					"text":        UseViceOwnerRole,
+					"postback_id": "send_message",
+					"value":       fmt.Sprintf("%v:%v", agent.Id, UseViceOwnerRole),
+					"user_ids":    []interface{}{},
+				},
+				{
+					"type":        "message",
+					"text":        UseAdministratorRole,
+					"postback_id": "send_message",
+					"value":       fmt.Sprintf("%v:%v", agent.Id, UseAdministratorRole),
+					"user_ids":    []interface{}{},
+				},
+				{
+					"type":        "message",
+					"text":        UseNormalRole,
+					"postback_id": "send_message",
+					"value":       fmt.Sprintf("%v:%v", agent.Id, UseNormalRole),
+					"user_ids":    []interface{}{},
+				},
+			},
 		})
 	}
 	return message

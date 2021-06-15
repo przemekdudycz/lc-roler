@@ -48,3 +48,29 @@ func GetAgentsList() []Agent {
 
 	return agentResponse
 }
+
+func UpdateAgentRole(roleName string, agentId string) {
+	httpClient := GetAuthenticatedHttpClient()
+	updateAgentUrl := config.UpdateAgentUrl()
+
+	reqBody, _ := json.Marshal(map[string]interface{}{
+		"id":   agentId,
+		"role": roleName,
+	})
+
+	req, _ := http.NewRequest("POST", updateAgentUrl, bytes.NewReader(reqBody))
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := httpClient.PerformRequest(req, "agentAuth")
+	fmt.Printf("UpdateAgentRoleStatusCode: %v", res.StatusCode)
+
+	if err != nil {
+		fmt.Printf("There was an error: %v", err.Error())
+	}
+
+	if res.StatusCode != 200 {
+		fmt.Printf("Invalid UpdateAgent response: %v", res.StatusCode)
+	}
+
+	defer res.Body.Close()
+}

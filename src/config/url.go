@@ -6,10 +6,10 @@ import (
 )
 
 var (
-	baseAppUrl = "http://2e883e0f1d0e.ngrok.io"
+	baseAppUrl = "http://2e49257e647b.ngrok.io"
 	// External URLs
-	authBaseUrl        = "https://accounts.labs.livechat.com"
-	authApiVersion     = "v2"
+	accountsBaseUrl    = "https://accounts.labs.livechat.com"
+	accountsApiVersion = "v2"
 	configBaseUrl      = "https://api.labs.livechatinc.com"
 	configApiVersion   = "v3.3"
 	customerApiBaseUrl = "https://api.labs.livechatinc.com"
@@ -21,11 +21,11 @@ func IntegrationUrl() string {
 }
 
 func AccessTokenUrl() string {
-	return strings.Join([]string{authBaseUrl, authApiVersion, "token"}, "/")
+	return strings.Join([]string{accountsBaseUrl, accountsApiVersion, "token"}, "/")
 }
 
 func CustomerAccessTokenUrl() string {
-	return strings.Join([]string{authBaseUrl, "customer"}, "/")
+	return strings.Join([]string{accountsBaseUrl, "customer"}, "/")
 }
 
 func WebhooksListUrl() string {
@@ -59,4 +59,16 @@ func GetSendEventUrl(licenseId string) string {
 
 func GetAgentsListUrl() string {
 	return strings.Join([]string{configBaseUrl, configApiVersion, "configuration", "action", "list_agents"}, "/")
+}
+
+func UpdateAgentUrl() string {
+	return strings.Join([]string{configBaseUrl, configApiVersion, "configuration", "action", "update_agent"}, "/")
+}
+
+func GetAccountsListUrl() string {
+	return strings.Join([]string{accountsBaseUrl, accountsApiVersion, "accounts"}, "/")
+}
+
+func UpdateAccountRolesUrl(accountId string) string {
+	return strings.Join([]string{accountsBaseUrl, accountsApiVersion, "accounts", accountId, "roles"}, "/")
 }

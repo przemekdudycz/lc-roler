@@ -1,4 +1,10 @@
 package helpers
 
-var GetAgentsList string = "agentsList"
-var GetRolesList string = "rolesList"
+const AppStartUp string = "lc-roler"
+
+const GetAgentsList string = "agentsList"
+const GetRolesList string = "rolesList"
+
+const UseViceOwnerRole string = "viceowner"
+const UseAdministratorRole string = "administrator"
+const UseNormalRole string = "normal"
