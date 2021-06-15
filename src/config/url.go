@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	baseAppUrl = "http://2e49257e647b.ngrok.io"
+	baseAppUrl = "http://360209078c29.ngrok.io"
 	// External URLs
 	accountsBaseUrl    = "https://accounts.labs.livechat.com"
 	accountsApiVersion = "v2"
@@ -63,6 +63,10 @@ func GetAgentsListUrl() string {
 
 func UpdateAgentUrl() string {
 	return strings.Join([]string{configBaseUrl, configApiVersion, "configuration", "action", "update_agent"}, "/")
+}
+
+func GetAccountUrl(accountId string) string {
+	return strings.Join([]string{accountsBaseUrl, accountsApiVersion, "accounts", accountId}, "/")
 }
 
 func GetAccountsListUrl() string {

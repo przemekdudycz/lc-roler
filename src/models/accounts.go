@@ -56,6 +56,37 @@ func GetAccountsList() []Account {
 	return accountsListResponse
 }
 
+func GetAccount(accountId string) Account {
+	httpClient := GetAuthenticatedHttpClient()
+	getAccountUrl := config.GetAccountUrl(accountId)
+
+	req, _ := http.NewRequest("GET", getAccountUrl, nil)
+
+	res, err := httpClient.PerformRequest(req, "agentAuth")
+
+	fmt.Printf("GetAccountStatusCode: %v", res.StatusCode)
+
+	if err != nil {
+		fmt.Printf("There was an error: %v", err.Error())
+	}
+
+	if res.StatusCode != 200 {
+		fmt.Printf("Invalid GetAccount response: %v", res.StatusCode)
+	}
+
+	defer res.Body.Close()
+
+	bodyBytes, _ := ioutil.ReadAll(res.Body)
+	accountResponse := Account{}
+	jsonError := json.Unmarshal(bodyBytes, &accountResponse)
+
+	if jsonError != nil {
+		panic(err)
+	}
+
+	return accountResponse
+}
+
 func UpdateAccountRoles(accountId string, setRoles []Role, deleteRoles []Role) Account {
 	httpClient := GetAuthenticatedHttpClient()
 	updateAccountRolesUrl := config.UpdateAccountRolesUrl(accountId)
