@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"strings"
 
 	"livechat.com/lc-roler/models"
 )
@@ -83,13 +84,23 @@ func AccountRolesMessage(chatId string, account models.Account) models.ChatMessa
 	}
 
 	for _, product := range products {
-		if productRoles, productRolesString := filterProductRoles(account.Roles, product); len(productRoles) > 0 {
-			message.Event.Elements = append(message.Event.Elements, map[string]interface{}{
+		_, productRolesString := filterProductRoles(account.Roles, product)
+
+		var card map[string]interface{}
+		if product == "Accounts" && strings.Contains(productRolesString, "owner") {
+			card = map[string]interface{}{
+				"title":    fmt.Sprintf("Product: %v", product),
+				"subtitle": fmt.Sprintf("Roles: \n %v", productRolesString),
+			}
+		} else {
+			card = map[string]interface{}{
 				"title":    fmt.Sprintf("Product: %v", product),
 				"subtitle": fmt.Sprintf("Roles: \n %v", productRolesString),
 				"buttons":  buildRolesButtonsForProduct(product, account),
-			})
+			}
 		}
+
+		message.Event.Elements = append(message.Event.Elements, card)
 	}
 
 	return message
@@ -104,6 +115,11 @@ func filterProductRoles(roles []models.Role, product string) ([]models.Role, str
 			productRolesString += fmt.Sprintf("%v, ", role.Role)
 		}
 	}
+
+	if productRolesString == "" {
+		productRolesString = "No role assigned"
+	}
+
 	return productRoles, productRolesString
 }
 
