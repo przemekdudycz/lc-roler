@@ -6,14 +6,13 @@ import (
 )
 
 var (
-	baseAppUrl = "http://360209078c29.ngrok.io"
+	baseAppUrl = "http://4452e0b1f7ff.ngrok.io"
 	// External URLs
 	accountsBaseUrl    = "https://accounts.labs.livechat.com"
 	accountsApiVersion = "v2"
-	configBaseUrl      = "https://api.labs.livechatinc.com"
+	liveChatBaseUrl    = "https://api.labs.livechatinc.com"
 	configApiVersion   = "v3.3"
-	customerApiBaseUrl = "https://api.labs.livechatinc.com"
-	customerApiVersion = "v3.3"
+	agentApiVersion    = "v3.3"
 )
 
 func IntegrationUrl() string {
@@ -29,23 +28,19 @@ func CustomerAccessTokenUrl() string {
 }
 
 func WebhooksListUrl() string {
-	return strings.Join([]string{configBaseUrl, configApiVersion, "configuration", "action", "list_webhooks"}, "/")
+	return strings.Join([]string{liveChatBaseUrl, configApiVersion, "configuration", "action", "list_webhooks"}, "/")
 }
 
 func RegisterWebhookUrl() string {
-	return strings.Join([]string{configBaseUrl, configApiVersion, "configuration", "action", "register_webhook"}, "/")
+	return strings.Join([]string{liveChatBaseUrl, configApiVersion, "configuration", "action", "register_webhook"}, "/")
 }
 
 func EnableWebhookUrl() string {
-	return strings.Join([]string{configBaseUrl, configApiVersion, "configuration", "action", "enable_license_webhooks"}, "/")
+	return strings.Join([]string{liveChatBaseUrl, configApiVersion, "configuration", "action", "enable_license_webhooks"}, "/")
 }
 
 func DestinationNewChatWebhookUrl() string {
 	return strings.Join([]string{baseAppUrl, "newchat"}, "/")
-}
-
-func DestinationRMPostbackWebhookUrl() string {
-	return strings.Join([]string{baseAppUrl, "rmpostback"}, "/")
 }
 
 func DestinationEventWebhookUrl() string {
@@ -53,16 +48,16 @@ func DestinationEventWebhookUrl() string {
 }
 
 func GetSendEventUrl(licenseId string) string {
-	url := strings.Join([]string{customerApiBaseUrl, customerApiVersion, "agent", "action", "send_event"}, "/")
+	url := strings.Join([]string{liveChatBaseUrl, agentApiVersion, "agent", "action", "send_event"}, "/")
 	return fmt.Sprintf("%v?license_id=%v", url, licenseId)
 }
 
 func GetAgentsListUrl() string {
-	return strings.Join([]string{configBaseUrl, configApiVersion, "configuration", "action", "list_agents"}, "/")
+	return strings.Join([]string{liveChatBaseUrl, configApiVersion, "configuration", "action", "list_agents"}, "/")
 }
 
 func UpdateAgentUrl() string {
-	return strings.Join([]string{configBaseUrl, configApiVersion, "configuration", "action", "update_agent"}, "/")
+	return strings.Join([]string{liveChatBaseUrl, configApiVersion, "configuration", "action", "update_agent"}, "/")
 }
 
 func GetAccountUrl(accountId string) string {

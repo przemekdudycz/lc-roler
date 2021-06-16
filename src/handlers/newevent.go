@@ -73,14 +73,6 @@ func runAction(actionValue string, chatId string) {
 		handleSetRole(chatId, splittedVal[1], splittedVal[2], splittedVal[3])
 		return
 	}
-
-	if strings.Contains(actionValue, helpers.UseAdministratorRole) ||
-		strings.Contains(actionValue, helpers.UseNormalRole) {
-		splittedValue := strings.Split(actionValue, ":")
-		handleRoleChange(splittedValue[0], splittedValue[1])
-		sendWelcomeMessage(chatId)
-		return
-	}
 }
 
 func handleGetAccountsList(chatId string) {
@@ -108,11 +100,6 @@ func handleSetRoles(chatId string, accountId string) {
 
 	models.SendMessageToCustomer(message)
 	fmt.Printf("Set roles message sended!")
-}
-
-func handleRoleChange(agentId string, roleName string) {
-	models.UpdateAgentRole(roleName, agentId)
-	fmt.Println("Role is updated!")
 }
 
 func sendWelcomeMessage(chatId string) {

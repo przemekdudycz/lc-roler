@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"livechat.com/lc-roler/config"
@@ -28,20 +27,16 @@ func SendMessageToCustomer(reqBodyValues ChatMessage) string {
 
 	reqBody, _ := json.Marshal(reqBodyValues)
 	req, _ := http.NewRequest("POST", sendEventUrl, bytes.NewReader(reqBody))
-
 	req.Header.Add("Content-Type", "application/json")
 
-	res, err := httpClient.PerformRequest(req, "agentAuth")
+	var eventIdResponse = struct {
+		EventId string `json:"event_id"`
+	}{}
+	err := httpClient.SendRequest(req, "agentAuth", &eventIdResponse)
+
 	if err != nil {
-		fmt.Printf("There was an error: %v", err.Error())
+		fmt.Printf("there was an error when SendMessageToCustomer: %v", err.Error())
 	}
 
-	if res.StatusCode != 200 {
-		fmt.Printf("Send message error: %v \n", res.StatusCode)
-	}
-
-	defer res.Body.Close()
-	raw, _ := ioutil.ReadAll(res.Body)
-
-	return string(raw)
+	return eventIdResponse.EventId
 }

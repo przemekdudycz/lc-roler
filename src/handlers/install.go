@@ -28,15 +28,12 @@ func HandleInstall(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Existing webhooks: %v", existingWebhooks)
 
 	newChatWebhookAction := "incoming_chat"
-	rmPostbackWebhookAction := "incoming_rich_message_postback"
 	eventWebhookAction := "incoming_event"
 
 	destinationNewChatWebhookUrl := config.DestinationNewChatWebhookUrl()
-	destinationRMPostbackWebhookUrl := config.DestinationRMPostbackWebhookUrl()
 	destintionEventWebhookUrl := config.DestinationEventWebhookUrl()
 
 	isNewChatWebhookExists := models.IsWebhookWithActionInSlice(existingWebhooks, newChatWebhookAction)
-	isRMPostbackWebhookExists := models.IsWebhookWithActionInSlice(existingWebhooks, rmPostbackWebhookAction)
 	isEventWebhookExists := models.IsWebhookWithActionInSlice(existingWebhooks, eventWebhookAction)
 
 	if !isNewChatWebhookExists {
@@ -50,19 +47,6 @@ func HandleInstall(w http.ResponseWriter, r *http.Request) {
 		}
 		webhookId := models.RegisterWebhook(webhookData)
 		fmt.Printf("NewChatWebhookId: %v \n", webhookId)
-	}
-
-	if !isRMPostbackWebhookExists {
-		webhookData := models.WebhookRequestBody{
-			Url:           destinationRMPostbackWebhookUrl,
-			Description:   "New chat lc-roler webhook",
-			Action:        rmPostbackWebhookAction,
-			SecretKey:     "verysecretkey",
-			OwnerClientId: authConfiguration.ClientId,
-			Type:          "license",
-		}
-		webhookId := models.RegisterWebhook(webhookData)
-		fmt.Printf("NewEventWebhookId: %v \n", webhookId)
 	}
 
 	if !isEventWebhookExists {
@@ -79,7 +63,7 @@ func HandleInstall(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("NewEventWebhookId: %v \n", webhookId)
 	}
 
-	if !isNewChatWebhookExists || !isRMPostbackWebhookExists || isEventWebhookExists {
+	if !isNewChatWebhookExists || isEventWebhookExists {
 		models.EnableWebhooks()
 	}
 

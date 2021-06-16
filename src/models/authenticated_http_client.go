@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -46,12 +47,36 @@ func (ac *AuthenticatedHttpClient) AddAuthData(authData *AuthData, authSource st
 	ac.authData[authSource] = *authData
 }
 
-func (ac *AuthenticatedHttpClient) PerformRequest(r *http.Request, accessSource string) (*http.Response, error) {
+func (ac *AuthenticatedHttpClient) SendAuthenticatedRequest(r *http.Request, accessSource string) (*http.Response, error) {
 	if ac.authData[accessSource].AccessToken == nil {
 		return nil, fmt.Errorf("you need to authenticate the application")
 	}
 	r.Header.Add("Authorization", fmt.Sprintf("Bearer %v", *ac.authData[accessSource].AccessToken))
 	return ac.httpClient.Do(r)
+}
+
+func (ac *AuthenticatedHttpClient) SendRequest(req *http.Request, accessSource string, returnObject interface{}) error {
+	res, err := ac.SendAuthenticatedRequest(req, accessSource)
+
+	fmt.Printf("HTTP response status code: %v \n", res.StatusCode)
+
+	if err != nil {
+		fmt.Printf("there was HTTP call error: %v", err.Error())
+		return err
+	}
+	defer res.Body.Close()
+
+	if returnObject != nil {
+		bodyBytes, _ := io.ReadAll(res.Body)
+		jsonError := json.Unmarshal(bodyBytes, returnObject)
+
+		if jsonError != nil {
+			fmt.Printf("there was Unmarshal error: %v", jsonError.Error())
+			return jsonError
+		}
+	}
+
+	return nil
 }
 
 func GetAuthTokens(code string, clientId string, clientSecret string) (string, string) {
@@ -97,20 +122,14 @@ func GetCustomerAccessTokens(clientId string) string {
 	req, _ := http.NewRequest("POST", customerAccessTokenUrl, bytes.NewReader(reqBody))
 	req.Header.Add("Content-Type", "application/json")
 
-	res, _ := httpClient.PerformRequest(req, "agentAuth")
-
-	defer res.Body.Close()
-
-	bodyBytes, _ := ioutil.ReadAll(res.Body)
-
-	fmt.Printf("Response body: %v", string(bodyBytes))
 	authResponseObject := struct {
 		AccessToken string `json:"access_token"`
 	}{}
+	err := httpClient.SendRequest(req, "agentAuth", &authResponseObject)
 
-	err := json.Unmarshal(bodyBytes, &authResponseObject)
 	if err != nil {
-		panic(err)
+		fmt.Printf("there was an error when GetCustomerAccessTokens: %v", err.Error())
 	}
+
 	return authResponseObject.AccessToken
 }

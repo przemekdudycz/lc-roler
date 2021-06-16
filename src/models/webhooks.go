@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"livechat.com/lc-roler/config"
@@ -44,21 +43,13 @@ func GetWebhooksList(clientId string) []WebhookResponse {
 	req, _ := http.NewRequest("POST", getWebhooksListUrl, bytes.NewReader(reqBody))
 	req.Header.Add("Content-Type", "application/json")
 
-	res, err := httpClient.PerformRequest(req, "agentAuth")
+	resPayload := []WebhookResponse{}
+	err := httpClient.SendRequest(req, "agentAuth", &resPayload)
 
 	if err != nil {
-		fmt.Printf("There was an error: %v", err.Error())
+		fmt.Printf("there was an error when GetWebhookList: %v", err.Error())
 	}
 
-	defer res.Body.Close()
-
-	raw, _ := ioutil.ReadAll(res.Body)
-
-	resPayload := []WebhookResponse{}
-	jsonerr := json.Unmarshal(raw, &resPayload)
-	if jsonerr != nil {
-		panic(err)
-	}
 	return resPayload
 }
 
@@ -78,15 +69,16 @@ func RegisterWebhook(webhookData WebhookRequestBody) string {
 	req, _ := http.NewRequest("POST", registerWebhookUrl, bytes.NewReader(reqBody))
 	req.Header.Add("Content-Type", "application/json")
 
-	res, err := httpClient.PerformRequest(req, "agentAuth")
+	idResponse := struct {
+		Id string `json:"id"`
+	}{}
+	err := httpClient.SendRequest(req, "agentAuth", &idResponse)
 
 	if err != nil {
-		fmt.Printf("There was an error: %v", err.Error())
+		fmt.Printf("there was an error when RegisterWebhook: %v", err.Error())
 	}
 
-	defer res.Body.Close()
-	raw, _ := ioutil.ReadAll(res.Body)
-	return string(raw)
+	return idResponse.Id
 }
 
 func EnableWebhooks() {
@@ -98,16 +90,9 @@ func EnableWebhooks() {
 	req, _ := http.NewRequest("POST", enableWebhookUrl, bytes.NewReader(reqBody))
 	req.Header.Add("Content-Type", "application/json")
 
-	res, err := httpClient.PerformRequest(req, "agentAuth")
-	fmt.Printf("After enabling: %v", res.StatusCode)
+	err := httpClient.SendRequest(req, "agentAuth", nil)
 
 	if err != nil {
-		fmt.Printf("There was an error: %v", err.Error())
+		fmt.Printf("there was an error when EnableWebhooks: %v", err.Error())
 	}
-
-	if res.StatusCode != 200 {
-		fmt.Printf("Invalid response: %v", res.StatusCode)
-	}
-
-	defer res.Body.Close()
 }
