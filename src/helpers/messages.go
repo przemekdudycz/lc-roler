@@ -26,7 +26,7 @@ func WelcomeMessage(chatId string) models.ChatMessage {
 					"buttons": []map[string]interface{}{
 						{
 							"type":        "message",
-							"text":        "Accounts List",
+							"text":        "Manage roles",
 							"postback_id": "send_message",
 							"value":       GetAccountsList,
 							"user_ids":    []interface{}{},
@@ -62,9 +62,16 @@ func AccountsListMessage(chatId string, accountsList []models.Account) models.Ch
 			"buttons": []map[string]interface{}{
 				{
 					"type":        "message",
-					"text":        "Set roles",
+					"text":        "Assign roles",
 					"postback_id": "send_message",
 					"value":       fmt.Sprintf("%v:%v", SetRoles, account.AccountId),
+					"user_ids":    []interface{}{},
+				},
+				{
+					"type":        "message",
+					"text":        "Revoke roles",
+					"postback_id": "send_message",
+					"value":       fmt.Sprintf("%v:%v", RevokeRoles, account.AccountId),
 					"user_ids":    []interface{}{},
 				},
 			},
@@ -73,7 +80,7 @@ func AccountsListMessage(chatId string, accountsList []models.Account) models.Ch
 	return message
 }
 
-func AccountRolesMessage(chatId string, account models.Account) models.ChatMessage {
+func SetAccountRolesMessage(chatId string, account models.Account) models.ChatMessage {
 	message := models.ChatMessage{
 		ChatId: chatId,
 		Event: models.ChatEvent{
@@ -131,6 +138,53 @@ func buildRolesButtonsForProduct(product string, account models.Account) []map[s
 			"text":        role,
 			"postback_id": "send_message",
 			"value":       fmt.Sprintf("%v:%v:%v:%v", SetRole, product, account.AccountId, role),
+			"user_ids":    []interface{}{},
+		})
+	}
+	return buttons
+}
+
+func RevokeAccountRolesMessage(chatId string, account models.Account) models.ChatMessage {
+	message := models.ChatMessage{
+		ChatId: chatId,
+		Event: models.ChatEvent{
+			Type:       "rich_message",
+			TemplateId: "cards",
+			Elements:   []map[string]interface{}{},
+		},
+	}
+
+	for _, product := range products {
+		productRoles, productRolesString := filterProductRoles(account.Roles, product)
+
+		var card map[string]interface{}
+		if len(productRoles) == 0 || (product == "Accounts" && strings.Contains(productRolesString, "owner")) {
+			card = map[string]interface{}{
+				"title":    fmt.Sprintf("Product: %v", product),
+				"subtitle": fmt.Sprintf("Roles: \n %v", productRolesString),
+			}
+		} else {
+			card = map[string]interface{}{
+				"title":    fmt.Sprintf("Product: %v", product),
+				"subtitle": fmt.Sprintf("Roles: \n %v", productRolesString),
+				"buttons":  buildRevokeRolesButtons(product, productRoles, account),
+			}
+		}
+
+		message.Event.Elements = append(message.Event.Elements, card)
+	}
+
+	return message
+}
+
+func buildRevokeRolesButtons(product string, rolesForProduct []models.Role, account models.Account) []map[string]interface{} {
+	buttons := []map[string]interface{}{}
+	for _, role := range rolesForProduct {
+		buttons = append(buttons, map[string]interface{}{
+			"type":        "message",
+			"text":        fmt.Sprintf("Revoke %v", role.Role),
+			"postback_id": "send_message",
+			"value":       fmt.Sprintf("%v:%v:%v:%v", RevokeRole, product, account.AccountId, role.Role),
 			"user_ids":    []interface{}{},
 		})
 	}

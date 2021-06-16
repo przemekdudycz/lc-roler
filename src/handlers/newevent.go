@@ -62,16 +62,29 @@ func runAction(actionValue string, chatId string) {
 		return
 	}
 
-	if strings.Contains(actionValue, helpers.SetRoles) {
+	splittedActionVal := strings.Split(actionValue, ":")
+	actionType := splittedActionVal[0]
+
+	if actionType == helpers.SetRoles {
 		splittedVal := strings.Split(actionValue, ":")
 		handleSetRoles(chatId, splittedVal[1])
 		return
 	}
 
-	if strings.Contains(actionValue, helpers.SetRole) {
+	if actionType == helpers.SetRole {
 		splittedVal := strings.Split(actionValue, ":")
 		handleSetRole(chatId, splittedVal[1], splittedVal[2], splittedVal[3])
 		return
+	}
+
+	if actionType == helpers.RevokeRoles {
+		splittedVal := strings.Split(actionValue, ":")
+		handleRevokeRoles(chatId, splittedVal[1])
+	}
+
+	if actionType == helpers.RevokeRole {
+		splittedVal := strings.Split(actionValue, ":")
+		handleRevokeRole(chatId, splittedVal[1], splittedVal[2], splittedVal[3])
 	}
 }
 
@@ -88,15 +101,14 @@ func handleSetRole(chatId string, product string, accountId string, role string)
 		{Product: product, Role: role},
 	}
 	models.UpdateAccountRoles(accountId, setRoles, nil)
-	fmt.Printf("Role updated!")
+	fmt.Printf("Roles updated!")
 
-	welcomeMessage := helpers.WelcomeMessage(chatId)
-	models.SendMessageToCustomer(welcomeMessage)
+	sendWelcomeMessage(chatId)
 }
 
 func handleSetRoles(chatId string, accountId string) {
 	account := models.GetAccount(accountId)
-	message := helpers.AccountRolesMessage(chatId, account)
+	message := helpers.SetAccountRolesMessage(chatId, account)
 
 	models.SendMessageToCustomer(message)
 	fmt.Printf("Set roles message sended!")
@@ -105,4 +117,21 @@ func handleSetRoles(chatId string, accountId string) {
 func sendWelcomeMessage(chatId string) {
 	welcomeMessage := helpers.WelcomeMessage(chatId)
 	models.SendMessageToCustomer(welcomeMessage)
+}
+
+func handleRevokeRoles(chatId string, accountId string) {
+	account := models.GetAccount(accountId)
+	message := helpers.RevokeAccountRolesMessage(chatId, account)
+
+	models.SendMessageToCustomer(message)
+}
+
+func handleRevokeRole(chatId string, product string, accountId string, role string) {
+	deleteRoles := []models.Role{
+		{Product: product, Role: role},
+	}
+	models.UpdateAccountRoles(accountId, nil, deleteRoles)
+	fmt.Printf("Roles updated!")
+
+	sendWelcomeMessage(chatId)
 }

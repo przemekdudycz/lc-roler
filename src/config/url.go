@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	baseAppUrl = "http://4452e0b1f7ff.ngrok.io"
+	baseAppUrl = "http://ebcc7115fd65.ngrok.io"
 	// External URLs
 	accountsBaseUrl    = "https://accounts.labs.livechat.com"
 	accountsApiVersion = "v2"
