@@ -66,25 +66,19 @@ func runAction(actionValue string, chatId string) {
 	actionType := splittedActionVal[0]
 
 	if actionType == helpers.SetRoles {
-		splittedVal := strings.Split(actionValue, ":")
-		handleSetRoles(chatId, splittedVal[1])
-		return
+		handleSetRoles(chatId, splittedActionVal[1])
 	}
 
 	if actionType == helpers.SetRole {
-		splittedVal := strings.Split(actionValue, ":")
-		handleSetRole(chatId, splittedVal[1], splittedVal[2], splittedVal[3])
-		return
+		handleSetRole(chatId, splittedActionVal[1], splittedActionVal[2], splittedActionVal[3])
 	}
 
 	if actionType == helpers.RevokeRoles {
-		splittedVal := strings.Split(actionValue, ":")
-		handleRevokeRoles(chatId, splittedVal[1])
+		handleRevokeRoles(chatId, splittedActionVal[1])
 	}
 
 	if actionType == helpers.RevokeRole {
-		splittedVal := strings.Split(actionValue, ":")
-		handleRevokeRole(chatId, splittedVal[1], splittedVal[2], splittedVal[3])
+		handleRevokeRole(chatId, splittedActionVal[1], splittedActionVal[2], splittedActionVal[3])
 	}
 }
 
@@ -101,7 +95,7 @@ func handleSetRole(chatId string, product string, accountId string, role string)
 		{Product: product, Role: role},
 	}
 	models.UpdateAccountRoles(accountId, setRoles, nil)
-	fmt.Printf("Roles updated!")
+	fmt.Printf("Roles updated! \n")
 
 	sendWelcomeMessage(chatId)
 }

@@ -125,6 +125,8 @@ func filterProductRoles(roles []models.Role, product string) ([]models.Role, str
 
 	if productRolesString == "" {
 		productRolesString = "No role assigned"
+	} else {
+		productRolesString = productRolesString[:len(productRolesString)-2]
 	}
 
 	return productRoles, productRolesString
